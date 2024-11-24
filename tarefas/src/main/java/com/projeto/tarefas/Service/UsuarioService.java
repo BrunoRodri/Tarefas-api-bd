@@ -33,10 +33,24 @@ public class UsuarioService {
         return new UsuarioDto(usuarioRepository.save(Usuario.fromDto(usuarioDto)));
     }
 
-    public UsuarioDto update(String id, UsuarioDto usuarioDto){
-        Usuario usuario = Usuario.fromDto(usuarioDto);
-        usuario.setId(id);
-        return new UsuarioDto(usuarioRepository.save(usuario));
+    public UsuarioDto update(String id, UsuarioDto usuarioDto) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário de ID: " + id + " não encontrado."));
+
+        if (usuarioDto.nome() != null) {
+            usuarioExistente.setNome(usuarioDto.nome());
+        }
+        if (usuarioDto.email() != null) {
+            usuarioExistente.setEmail(usuarioDto.email());
+        }
+        if (usuarioDto.telefone() != null) {
+            usuarioExistente.setTelefone(usuarioDto.telefone());
+        }
+        if (usuarioDto.tarefas() != null) {
+            usuarioExistente.setTarefas(usuarioDto.tarefas());
+        }
+
+        return new UsuarioDto(usuarioRepository.save(usuarioExistente));
     }
     public void delete(String id) {
         usuarioRepository.deleteById(id);

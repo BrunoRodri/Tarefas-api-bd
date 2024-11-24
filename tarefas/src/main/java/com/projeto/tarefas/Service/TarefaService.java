@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -40,8 +42,31 @@ public class TarefaService {
         return new TarefaDto(tarefaRepository.save(tarefa));
     }
 
-    public void delete(String id){
-        tarefaRepository.deleteById(id);
+    public void delete(String id) {
+        Tarefa tarefa = tarefaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Tarefa de Id: " + id + " não encontrada."));
+        tarefa.setDeleted(true);
+        tarefaRepository.save(tarefa);
     }
 
+    public List<TarefaDto> findAllDeletedByUsuarioId(String usuarioId) {
+        return tarefaRepository.findAllDeletedByUsuarioId(usuarioId)
+                .stream()
+                .map(TarefaDto::new)
+                .toList();
+    }
+
+    public List<TarefaDto> findByTitulo(String titulo) {
+        return tarefaRepository.findByTituloContainingIgnoreCase(titulo)
+                .stream()
+                .map(TarefaDto::new)
+                .toList();
+    }
+
+    public List<TarefaDto> findByDataCriacaoBetween(LocalDate startDate, LocalDate endDate) {
+        return tarefaRepository.findByDataCriacaoBetween(startDate, endDate)
+                .stream()
+                .map(TarefaDto::new)
+                .toList();
+    }
 }
